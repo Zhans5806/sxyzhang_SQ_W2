@@ -4,23 +4,14 @@
 // By: Shelisa Zhang 
 // Course: GBDA 302 
 // ------------------------------------------------------------
-// PLATFORMS ARRAY
-// Each platform is an object with x, y, width, and height.
-// x and y are the TOP-LEFT corner (same as rect()).
-//
-// Storing platforms in an array means:
-//   - We can loop through all of them with one for loop
-//   - Adding a new platform = adding one line of data
-//   - Later we can load this data from a JSON file instead
-// ------------------------------------------------------------
 let platforms = [
   // { x, y, w, h }
   { x: 0,   y: 410, w: 800, h: 40 }, // ground (full width floor)
   { x: 80,  y: 310, w: 120, h: 16 }, // left low platform
-  { x: 280, y: 240, w: 140, h: 16 }, // centre platform
-  { x: 500, y: 170, w: 120, h: 16 }, // right high platform
-  { x: 160, y: 150, w: 100, h: 16 }, // left high platform
-  { x: 360, y: 320, w: 110, h: 16 }, // centre low platform
+  { x: 280, y: 160, w: 140, h: 16 }, // centre platform
+  { x: 500, y: 200, w: 120, h: 16 }, // right high platform
+  { x: 160, y: 230, w: 100, h: 16 }, // left high platform
+  { x: 360, y: 290, w: 110, h: 16 }, // centre low platform
   { x: 620, y: 290, w: 130, h: 16 }, // far right platform
 ];
 
@@ -28,7 +19,8 @@ let platforms = [
 // PLAYER OBJECT — same structure as Example 1
 // w and h are added here for use in collision detection.
 // ------------------------------------------------------------
-let playerimg;
+let playerImg;
+let bgImg;
 let player = {
   x: 100,
   y: 100,
@@ -58,29 +50,24 @@ const GRAVITY = 0.6; // downward force added to vy every frame
 let blobT = 0;
 
 // Platform colour stored as an array so it can be reused easily
-const PLATFORM_COLOR = [255, 160, 50]; // warm orange
+const PLATFORM_COLOR = [201, 167, 109]; // tan
 
 
 function preload() {
-  playerImg = loadImage("Sushi.png");
+  playerImg = loadImage("assets/images/Sushi.png");
+  bgImg = loadImage("assets/images/sushishop.webp");
 }
-
 
 function setup() {
   createCanvas(800, 450);
-
   // Place player on top of the ground platform (index 0 in the array)
   player.y = platforms[0].y - player.r;
 }
 
 // ============================================================
-// draw()
-// Runs repeatedly in a loop after setup() finishes.
-// Each frame we clear the background, handle input,
-// apply physics, resolve collisions, and draw everything.
-// ============================================================
 function draw() {
-  background(10);
+  //background(10);
+  image(bgImg, 0, 0, width, height);
 
   handleInput();
   applyPhysics();
@@ -206,6 +193,20 @@ function resolvePlatformCollisions() {
       playerBottom <= platTop + 20;
 
     if (overlapsHorizontally && landingOnTop) {
+
+      if (i === 4) {
+
+        let ground = platforms[0]; // ground platform
+
+        player.x = random(ground.x + player.r, ground.x + ground.w - player.r);
+        player.y = ground.y - player.r;
+
+        player.vx = 0;
+        player.vy = 0;
+
+        return; // stop checking other platforms this frame
+      }
+
       player.y = platTop - player.r; // snap to platform surface
       player.vy = 0;                 // stop falling
       player.onGround = true;        // allow jumping again
@@ -248,7 +249,7 @@ function drawPlayer() {
 // how to interact without needing external instructions.
 // ------------------------------------------------------------
 function drawHUD() {
-  fill(180);
+  fill(0);
   noStroke();
   textSize(13);
   textAlign(LEFT);
